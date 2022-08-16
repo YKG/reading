@@ -58,6 +58,12 @@ make bzImage -j20
 
 ```console
 $ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic -append "console=ttyS0"
+```
+
+<details>
+  <summary>Console output</summary>
+
+```
 Linux version 5.19.1+ (ykg@tb) (gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #38 Tue Aug 16 12
 x86/fpu: x87 FPU will use FXSAVE
 signal: max sigframe size: 1440
@@ -149,6 +155,9 @@ Call Trace:
 Kernel Offset: disabled
 ---[ end Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0) ]---
 ```
+</details>
+
+
 
 到这里 `VFS: Unable to mount root fs on unknown-block`，查得需要有 initramfs。
 处理方式可以是使用 `-initrd` 参数，但在此之前需要构建一个 initramfs 的 image。
@@ -179,6 +188,12 @@ make bzImage -j20
 
 ```console
 $ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic -append "console=ttyS0" -initrd initramfs.img
+```
+
+<details>
+  <summary>Console output</summary>
+
+```
 Linux version 5.19.1+ (ykg@tb) (gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #39 Tue Aug 16 10:48:18 CST 2022
 x86/fpu: x87 FPU will use FXSAVE
 signal: max sigframe size: 1440
@@ -273,6 +288,7 @@ Call Trace:
 Kernel Offset: disabled
 ---[ end Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0) ]---
 ```
+</details>
 
 可以看到这个错误提示 `Initramfs unpacking failed: compression method zstd not configured`，需要开启 ZSTD 支持
 
@@ -288,6 +304,12 @@ make bzImage -j20
 
 ```console
 $ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic -append "console=ttyS0" -initrd initramfs.img
+```
+
+<details>
+  <summary>Console output</summary>
+
+```
 Linux version 5.19.1+ (ykg@tb) (gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #40 Tue Aug 16 10:52:24 CST 2022
 x86/fpu: x87 FPU will use FXSAVE
 signal: max sigframe size: 1440
@@ -465,6 +487,7 @@ Call Trace:
 Kernel Offset: disabled
 ---[ end Kernel panic - not syncing: System is deadlocked on memory ]---
 ```
+</details>
 
 最后提示 `System is deadlocked on memory`，先调高内存，可以使用 `-m` 参数。
 
@@ -480,6 +503,12 @@ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic -append "console=tty
 
 ```console
 $ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic -append "console=ttyS0" -initrd initramfs.img -m 512
+```
+
+<details>
+  <summary>Console output</summary>
+
+```
 Linux version 5.19.1+ (ykg@tb) (gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #40 Tue Aug 16 10:52:24 CST 2022
 x86/fpu: x87 FPU will use FXSAVE
 signal: max sigframe size: 1440
@@ -576,6 +605,7 @@ Call Trace:
 Kernel Offset: disabled
 ---[ end Kernel panic - not syncing: No working init found.  Try passing init= option to kernel. See Linux Documentation/admin-guide/init.rst for guidance. ]---
 ```
+</details>
 
 这里最后提示 `No working init found`, 原因是没有添加可执行文件格式支持
 
@@ -594,6 +624,12 @@ make bzImage -j20
 
 ```console
 $ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic -append "console=ttyS0" -initrd initramfs.img -m 512
+```
+
+<details>
+  <summary>Console output</summary>
+
+```
 Linux version 5.19.1+ (ykg@tb) (gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #41 Tue Aug 16 11:01:53 CST 2022
 x86/fpu: x87 FPU will use FXSAVE
 signal: max sigframe size: 1440
@@ -691,6 +727,7 @@ Call Trace:
 Kernel Offset: disabled
 ---[ end Kernel panic - not syncing: No working init found.  Try passing init= option to kernel. See Linux Documentation/admin-guide/init.rst for guidance. ]---
 ```
+</details>
 
 到这一步时曾卡了一些时间，后来通过 printk 定位到原因是 arch 不匹配问题，kernel 配置时没有开启 `64-bit Kernel` 选项。
 
@@ -706,6 +743,12 @@ make bzImage -j20
 
 ```console
 $ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic -append "console=ttyS0" -initrd initramfs.img -m 512
+```
+
+<details>
+  <summary>Console output</summary>
+
+```
 Linux version 5.19.1+ (ykg@tb) (gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #42 Tue Aug 16 11:08:31 CST 2022
 Command line: console=ttyS0
 x86/fpu: x87 FPU will use FXSAVE
@@ -829,6 +872,7 @@ Enter 'help' for a list of built-in commands.
    52 0         3060 R    {ps} sh -i
 (initramfs)
 ```
+</details>
 
 得到了 shell，但这里还有个问题，如果没有开启 `64-bit kernel`，按说我使用 `qemu-system-i386` 启动应该没有问题，但结果是不行，不知道为什么。
 
@@ -844,6 +888,12 @@ make bzImage -j20
 
 ```console
 $ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic -append "console=ttyS0" -initrd initramfs.img -m 512
+```
+
+<details>
+  <summary>Console output</summary>
+
+```
 [    0.000000] Linux version 5.19.1+ (ykg@tb) (gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #43 Tue Aug 16 11:13:06 CST 2022
 [    0.000000] Command line: console=ttyS0
 [    0.000000] x86/fpu: x87 FPU will use FXSAVE
@@ -948,6 +998,8 @@ Enter 'help' for a list of built-in commands.
 
 (initramfs)
 ```
+</details>
+
 
 至此目标达成。
 
