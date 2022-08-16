@@ -1034,3 +1034,7 @@ Enter 'help' for a list of built-in commands.
 - 为什么内存需要 512MB 才够启动？
 - initramfs 为什么一定要有，为什么没有就启动不了，为什么有了就可以？
 - 为什么 qemu-system-i386 不能启动未开启 64-bit kernel 的 bzImage？
+
+# 后记
+
+- 在 Ubuntu 16.04 32-bit 版本上创建了一个 initramfs.img，不开启 64-bit kernel 情况下，使用 qemu-system-i386 启动没有问题。只是需要开启 gzip 压缩格式 initramfs 支持
